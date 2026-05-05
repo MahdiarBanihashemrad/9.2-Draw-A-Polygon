@@ -4,6 +4,7 @@ import random
 
 pen = Turtle()
 screen = Screen()
+player = None
 
 
 
@@ -51,6 +52,61 @@ def generate_random_hex_color():
     return f"#{random.randint(0, 0xFFFFFF):06x}"
 
 
+def create_player():
+    player = Turtle()
+    player.speed(0)
+    player.color("white")
+    player.shape("triangle")
+    player.pu()
+    player.goto(0, 0)
+    return player
+
+
+def spawn_player():
+    global player
+    if player == None:
+        player = create_player()
+
+
+def player_up():
+    if player != None:
+        player.setheading(90)
+
+
+def player_down():
+    if player != None:
+        player.setheading(270)
+
+
+def player_left():
+    if player != None:
+        player.setheading(180)
+
+
+def player_right():
+    if player != None:
+        player.setheading(0)
+
+
+def move_player():
+    if player != None:
+        player.forward(8)
+        if player.xcor() > 335 or player.xcor() < -345:
+            player.setheading(180-player.heading())
+
+        if player.ycor() > 347 or player.ycor() < -339:
+            player.setheading(player.heading() * -1)
+
+
+def player_kill_turtles(turtles):
+    if player != None:
+        for turtle_object in turtles[:]:
+            if turtle_object != player and player.distance(turtle_object) < 20:
+                turtle_object.hideturtle()
+                turtles.remove(turtle_object)
+    return turtles
+
+
 def playing_area():
     t = Turtle()
     t.color("teal")
@@ -67,6 +123,13 @@ def playing_area():
 
 screen.bgcolor("black")
 screen.setup(750, 750)
+screen.tracer(0)
+screen.listen()
+screen.onkeypress(spawn_player, "space")
+screen.onkeypress(player_up, "w")
+screen.onkeypress(player_down, "s")
+screen.onkeypress(player_left, "a")
+screen.onkeypress(player_right, "d")
 
 
 pen = Turtle()
@@ -87,6 +150,9 @@ turtles = [pen]
 while True:
     for obj in turtles:
         turtles = move_forward(obj, turtles)
+    move_player()
+    turtles = player_kill_turtles(turtles)
+    screen.update()
 
 
 
